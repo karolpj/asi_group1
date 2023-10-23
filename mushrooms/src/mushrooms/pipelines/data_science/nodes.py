@@ -3,7 +3,6 @@ from typing import Dict, Tuple
 
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import r2_score
 from sklearn.model_selection import train_test_split
 
@@ -17,15 +16,15 @@ def split_data(data: pd.DataFrame) -> Tuple:
     Returns:
         Split data.
     """
-    X = data.drop(columns='class')
-    y = data['class']
+    X = data.drop(columns=['class_e',"class_p"])
+    y = data['class_e']
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.25, random_state=42, shuffle=True
     )
     return X_train, X_test, y_train, y_test
 
 
-def train_model(X_train: pd.DataFrame, y_train: pd.Series) -> RandomForestClassifier:
+def train_model(X_train: pd.DataFrame, y_train: pd.Series) -> LogisticRegression:
     """Trains the linear regression model.
 
     Args:
@@ -35,11 +34,8 @@ def train_model(X_train: pd.DataFrame, y_train: pd.Series) -> RandomForestClassi
     Returns:
         Trained model.
     """
-    print(X_train, y_train)
-    print(X_train.info())
-    regressor = RandomForestClassifier()
+    regressor = LogisticRegression()
     regressor.fit(X_train, y_train)
-    print("here")
     return regressor
 
 

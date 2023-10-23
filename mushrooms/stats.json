@@ -1,1 +1,1 @@
-{"model_input_table": {"rows": 759609, "columns": 28, "file_size": 4742890}, "X_train": {"rows": 607687, "columns": 8}, "X_test": {"rows": 151922, "columns": 8}}
+{"mushrooms": {"rows": 8124, "columns": 23, "file_size": 382127}, "preprocessed_mushrooms": {"rows": 8124, "columns": 119, "file_size": 146458}, "model_input_table": {"rows": 8124, "columns": 119, "file_size": 146458}, "X_train": {"rows": 6093, "columns": 117}, "X_test": {"rows": 2031, "columns": 117}}

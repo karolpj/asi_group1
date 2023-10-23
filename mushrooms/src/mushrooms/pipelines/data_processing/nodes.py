@@ -3,7 +3,8 @@ import pandas as pd
 
 
 def preprocess_mushrooms(mushrooms: pd.DataFrame) -> pd.DataFrame:
-    return mushrooms
+    onehot = pd.get_dummies(mushrooms,dtype=int)
+    return onehot
 
 def create_model_input_table(
     mushrooms: pd.DataFrame
