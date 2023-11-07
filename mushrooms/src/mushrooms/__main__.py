@@ -7,6 +7,7 @@ from pathlib import Path
 from kedro.framework.cli.utils import KedroCliError, load_entry_points
 from kedro.framework.project import configure_project
 
+import wandb
 
 def _find_run_command(package_name):
     try:
@@ -41,7 +42,9 @@ def main(*args, **kwargs):
     configure_project(package_name)
     run = _find_run_command(package_name)
     run(*args, **kwargs)
+    
 
 
 if __name__ == "__main__":
+
     main()

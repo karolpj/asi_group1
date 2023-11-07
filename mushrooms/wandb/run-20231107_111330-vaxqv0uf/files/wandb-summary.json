@@ -1,0 +1,1 @@
+{"reg_r2": 1.0, "reg_mse": 0.0, "reg_explained_variance": 1.0, "score_rfc": 1.0, "mse_rfc": 0.0, "eva_rfc": 1.0, "_timestamp": 1699352010.802026, "_runtime": 0.772711992263794, "_step": 0, "_wandb": {"runtime": 0}}

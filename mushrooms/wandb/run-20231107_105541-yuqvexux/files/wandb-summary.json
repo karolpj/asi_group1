@@ -1,0 +1,1 @@
+{"model": "regressor_01", "r2": 0.8381768284831316, "mse": 0.04040780803182892, "explained_variance": 0.8389395837873175, "_timestamp": 1699350943.499024, "_runtime": 1.9865548610687256, "_step": 0, "_wandb": {"runtime": 0}}
