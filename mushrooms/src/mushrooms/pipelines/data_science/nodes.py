@@ -2,12 +2,8 @@ import logging
 from typing import Dict, Tuple
 
 import pandas as pd
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import r2_score, explained_variance_score, mean_squared_error
 from sklearn.model_selection import train_test_split
 import wandb
-
 from autogluon.tabular import TabularDataset, TabularPredictor
 
 
@@ -20,6 +16,7 @@ def split_data(data: pd.DataFrame) -> Tuple:
     Returns:
         Split data.
     """
+    data.dropna(inplace=True)
     X = data.drop(columns=['class_e',"class_p"])
     y = data['class_e']
     X_train, X_test, y_train, y_test = train_test_split(
@@ -29,7 +26,7 @@ def split_data(data: pd.DataFrame) -> Tuple:
     return X_train, X_test, y_train, y_test
 
 
-def train_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> [TabularPredictor]:
+def train_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> TabularPredictor:
     """Trains the linear regression model.
 
     Args:
@@ -39,23 +36,11 @@ def train_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> [TabularPredict
     Returns:
         Trained model.
     """
-    
-    
-    
     label = "label"
     y_train = pd.DataFrame({"label":y_train})
-    data = pd.concat([X_train,y_train])
+    data = pd.concat([X_train,y_train],axis=1)
     train_data = TabularDataset(data)
-
     predictor = TabularPredictor(label=label).fit(train_data)
-
-
-
-    #rfc = RandomForestClassifier()
-    #rfc.fit(X_train,y_train)
-
-    #regressor = LogisticRegression()
-    #regressor.fit(X_train, y_train)
     return predictor
 
 
@@ -69,8 +54,8 @@ def evaluate_model(
         X_test: Testing data of independent features.
         y_test: Testing data for price.
     """
-
-    data = TabularDataset(pd.concat([X_test,y_test]))
+    y_test = pd.DataFrame({"label":y_test})
+    data = TabularDataset(pd.concat([X_test,y_test],axis=1))
     
     predictor.evaluate(data)
 
@@ -89,8 +74,5 @@ def evaluate_model(
     #    "mse_rfc": mse_rfc,
     #    "eva_rfc":eva_rfc
 
-
-    #})
-
     wandb.finish()
-    logger.info("Model has a coefficient R^2 of %.3f on test data.", score_reg)
+    # logger.info("Model has a coefficient R^2 of %.3f on test data.", score_reg)

@@ -5,10 +5,24 @@ name = "pypi"
 
 [packages]
 pandas = "*"
-scikit-learn = "*"
-kedro = "*"
+scikit-learn = "~=1.0"
+kedro = "~=0.18.13"
 wandb = "*"
 autogluon = "*"
+black = "~=22.0"
+flake8 = "<5.0,>=3.7.9"
+ipython = "~=8.10"
+isort = "~=5.0"
+jupyter = "~=1.0"
+jupyterlab-server = ">=2.11.1,<2.16.0"
+jupyterlab = "~=3.0"
+kedro-datasets = {version = "~=1.0", extras = ["pandas.csvdataset", "pandas.exceldataset", "pandas.parquetdataset"]}
+kedro-telemetry = "~=0.2.0"
+kedro-viz = "~=6.0"
+nbstripout = "~=0.4"
+pytest-cov = "~=3.0"
+pytest-mock = "<2.0,>=1.7.1"
+pytest = "~=7.2"
 
 [dev-packages]
 
