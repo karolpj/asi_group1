@@ -23,6 +23,8 @@ nbstripout = "~=0.4"
 pytest-cov = "~=3.0"
 pytest-mock = "<2.0,>=1.7.1"
 pytest = "~=7.2"
+fastapi = "*"
+uvicorn = "*"
 
 [dev-packages]
 
