@@ -30,7 +30,7 @@ class MushroomInput(BaseModel):
     population: str
     habitat: str
 
-model_path = "../mushrooms/AutogluonModels/ag-20231120_210529/models/CatBoost/model.pkl"
+model_path = "../bestmodel/model.pkl"
 with open(model_path, 'rb') as file:
     loaded_model = pickle.load(file)
     

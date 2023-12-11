@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 import wandb
 from autogluon.tabular import TabularDataset, TabularPredictor
 
-
+path = "../models"
 def split_data(data: pd.DataFrame) -> Tuple:
     """Splits data into features and targets training and test sets.
 
@@ -40,7 +40,7 @@ def train_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> TabularPredicto
     y_train = pd.DataFrame({"label":y_train})
     data = pd.concat([X_train,y_train],axis=1)
     train_data = TabularDataset(data)
-    predictor = TabularPredictor(label=label).fit(train_data)
+    predictor = TabularPredictor(label=label,path=path).fit(train_data)
     return predictor
 
 
@@ -60,6 +60,12 @@ def evaluate_model(
     predictor.evaluate(data)
 
     predictor.leaderboard(data)
+    leaderboard = predictor.leaderboard(silent=True)
+    best_model = leaderboard.iloc[0]['model']  # Pobranie nazwy najlepszego modelu
+    import shutil
+    shutil.move(f"{path}/models/{best_model}", "../bestmodel")
+
+    
 
     logger = logging.getLogger(__name__)
     wandb.init(
