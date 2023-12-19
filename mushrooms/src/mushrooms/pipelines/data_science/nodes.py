@@ -71,6 +71,8 @@ def evaluate_model(
     wandb.init(
         project="mushrooms"
     )
+
+    wandb.log({"best model" : leaderboard.iloc[0]["model"]})
     
     #wandb.log({
     #    "reg_r2":score_reg,

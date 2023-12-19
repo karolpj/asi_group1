@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import subprocess
 
 
 cap_shape_values = ['x', 'b', 'f', 's', 'k', 'c']
@@ -26,10 +27,17 @@ population_values = ['v', 'y', 's', 'n', 'a', 'c']
 habitat_values = ['d', 'g', 'p', 'l', 'u', 'm', 'w']
 
 
+pred = None
+
+def run_kerdo_pipeline():
+	subprocess.run(["cd ./mushrooms & python -m kedro run"])
+
+
 def get_prediction(data):
 	URL = "http://127.0.0.1:8000/predict"
 	resp = requests.post(URL, json=data)
-	return resp.json()
+	pred = resp.json()
+	
 
 
 def main():
@@ -95,6 +103,8 @@ def main():
 	URL = "http://127.0.0.1:8000/predict"
 	resp = requests.post(URL, json=data)
 	pred = resp.json()
+	print(resp)
+	print(pred)
 
 	# 0 = poison
 	# 1 = edible

@@ -7,6 +7,7 @@ __pycache__/
 
 mushrooms/AutogluonModels/
 mushrooms/wandb/
+.venv
 
 # C extensions
 *.so
