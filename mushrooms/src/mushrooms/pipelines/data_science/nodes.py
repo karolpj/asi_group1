@@ -1,5 +1,6 @@
-import logging
-from typing import Dict, Tuple
+from typing import Tuple
+import shutil
+
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -7,6 +8,8 @@ import wandb
 from autogluon.tabular import TabularDataset, TabularPredictor
 
 path = "../models"
+
+
 def split_data(data: pd.DataFrame) -> Tuple:
     """Splits data into features and targets training and test sets.
 
@@ -17,8 +20,8 @@ def split_data(data: pd.DataFrame) -> Tuple:
         Split data.
     """
     data.dropna(inplace=True)
-    X = data.drop(columns=['class_e',"class_p"])
-    y = data['class_e']
+    X = data.drop(columns=["class_e", "class_p"])
+    y = data["class_e"]
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.25, random_state=42, shuffle=True
     )
@@ -37,10 +40,10 @@ def train_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> TabularPredicto
         Trained model.
     """
     label = "label"
-    y_train = pd.DataFrame({"label":y_train})
-    data = pd.concat([X_train,y_train],axis=1)
+    y_train = pd.DataFrame({"label": y_train})
+    data = pd.concat([X_train, y_train], axis=1)
     train_data = TabularDataset(data)
-    predictor = TabularPredictor(label=label,path=path).fit(train_data)
+    predictor = TabularPredictor(label=label, path=path).fit(train_data)
     return predictor
 
 
@@ -54,33 +57,18 @@ def evaluate_model(
         X_test: Testing data of independent features.
         y_test: Testing data for price.
     """
-    y_test = pd.DataFrame({"label":y_test})
-    data = TabularDataset(pd.concat([X_test,y_test],axis=1))
-    
-    predictor.evaluate(data)
+    y_test = pd.DataFrame({"label": y_test})
+    data = TabularDataset(pd.concat([X_test, y_test], axis=1))
+
+    evaluation = predictor.evaluate(data)
 
     predictor.leaderboard(data)
     leaderboard = predictor.leaderboard(silent=True)
-    best_model = leaderboard.iloc[0]['model']  # Pobranie nazwy najlepszego modelu
-    import shutil
-    shutil.move(f"{path}/models/{best_model}", "../bestmodel")
+    best_model = leaderboard.iloc[0]["model"]  # Pobranie nazwy najlepszego modelu
+    shutil.move(f"{path}/models/{best_model}/model.pkl", "../bestmodel/model.pkl")
 
-    
-
-    logger = logging.getLogger(__name__)
-    wandb.init(
-        project="mushrooms"
-    )
-
-    wandb.log({"best model" : leaderboard.iloc[0]["model"]})
-    
-    #wandb.log({
-    #    "reg_r2":score_reg,
-    #    "reg_mse":mse_reg,
-    #    "reg_explained_variance":eva_reg,
-    #    "score_rfc": score_rfc,
-    #    "mse_rfc": mse_rfc,
-    #    "eva_rfc":eva_rfc
+    wandb.init(project="mushrooms")
+    wandb.log({"best model": leaderboard.iloc[0]["model"]})
+    wandb.log(**evaluation)
 
     wandb.finish()
-    # logger.info("Model has a coefficient R^2 of %.3f on test data.", score_reg)

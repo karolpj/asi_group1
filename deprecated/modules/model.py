@@ -1,16 +1,16 @@
 from sklearn.linear_model import LogisticRegression
-from sklearn.neighbors import KNeighborsClassifier, RadiusNeighborsClassifier
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score, classification_report
 import pickle
 
 
-def lgr_model(X_train, X_test, y_train, y_test,X_val, y_val):
+def lgr_model(X_train, X_test, y_train, y_test, X_val, y_val):
     logmodel = LogisticRegression(max_iter=500)
-    logmodel.fit(X_train,y_train)
+    logmodel.fit(X_train, y_train)
     y_pred_val = logmodel.predict(X_val)
     y_pred = logmodel.predict(X_test)
-    print(classification_report(y_test,y_pred))
-    print(classification_report(y_val,y_pred_val))
+    print(classification_report(y_test, y_pred))
+    print(classification_report(y_val, y_pred_val))
     pickle.dump(logmodel, open("./models/lgr.pkl", "wb"))
 
 

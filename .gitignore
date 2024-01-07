@@ -4,6 +4,10 @@ __pycache__/
 *$py.class
 /models/
 /mushrooms/wandb/
+Pipfile.lock
+Pipfile
+.telemetry
+.ruff_cache
 
 mushrooms/AutogluonModels/
 mushrooms/wandb/
