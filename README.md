@@ -14,7 +14,7 @@
 
 ## Running
 - Install requirements `pip install -r requirements.txt`
-- Init wandb
 - Run fastapi backend `cd ./fastpi & uvicorn main:app`
 - Run kedro viz `cd ./mushrooms & kedro viz`
+- Login to wandb `wandb init`
 - Run streamlit app `streamlit run ./streamlit_app.py`

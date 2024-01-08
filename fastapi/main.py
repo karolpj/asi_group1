@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 import pandas as pd
 import pickle
+import shutil
 
 from pydantic import BaseModel
 
@@ -33,7 +34,8 @@ class MushroomInput(BaseModel):
 
 
 model_path = "../bestmodel/model.pkl"
-with open(model_path, "rb") as file:
+shutil.copyfile(model_path, "./model.pkl")
+with open("./model.pkl", "rb") as file:
     loaded_model = pickle.load(file)
 
 columns = [

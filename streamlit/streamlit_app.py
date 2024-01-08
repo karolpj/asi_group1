@@ -28,15 +28,34 @@ spore_print_color_values = ["w", "n", "k", "h", "r", "u", "o", "y", "b"]
 population_values = ["v", "y", "s", "n", "a", "c"]
 habitat_values = ["d", "g", "p", "l", "u", "m", "w"]
 
+hyperparameters_options = ["default", "light", "very_light", "toy"]
+presets_options = [
+    "best_quality",
+    "high_quality",
+    "good_quality",
+    "medium_quality",
+    "optimize_for_deployment",
+]
+eval_metric_options = [
+    "accuracy",
+    "balanced_accuracy",
+    "mcc",
+    "roc_auc",
+    "f1",
+]
+time_limit_options = [60, 120, 180]
+
 
 pred = None
 
 
-def run_kerdo_pipeline():
+def run_kerdo_pipeline(**kwargs):
     os.chdir("./mushrooms")
     bootstrap_project(os.getcwd())
-    session = KedroSession.create()
+    params = {"model_params": kwargs}
+    session = KedroSession.create(extra_params=params)
     session.run()
+    session.close()
     os.chdir("..")
 
 
@@ -47,92 +66,106 @@ def get_prediction(data):
 
 
 def main():
-	overview = st.container()
-	left, center, right = st.columns(3)
-	prediction = st.container()
+    overview = st.container()
+    left, center, right = st.columns(3)
+    prediction = st.container()
 
-	with overview:
-		st.title("Mushroom edability prediction app")
-		st.button("Run Kedro Pipeline", on_click=run_kerdo_pipeline)
-		st.link_button("Go to KedroViz", "http://127.0.0.1:4141/")
-		st.subheader("Select mushroom features:")
+    with overview:
+        st.title("Mushroom edability prediction app")
+        st.subheader("Select mushroom features:")
 
-	with left:
-		cap_shape_radio = st.selectbox("Select cap shape:", cap_shape_values)
-		cap_surface_radio = st.selectbox("Select cap surface:", cap_surface_values)
-		cap_color_radio = st.selectbox("Select cap color:", cap_color_values)
-		bruises_radio = st.selectbox("Select bruises:", bruises_values)
-		odor_radio = st.selectbox("Select odor:", odor_values)
-		gill_attachment_radio = st.selectbox(
-			"Select gill attachment:", gill_attachment_values
-		)
-		gill_spacing_radio = st.selectbox("Select gill spacing:", gill_spacing_values)
+    with left:
+        cap_shape_radio = st.selectbox("Select cap shape:", cap_shape_values)
+        cap_surface_radio = st.selectbox("Select cap surface:", cap_surface_values)
+        cap_color_radio = st.selectbox("Select cap color:", cap_color_values)
+        bruises_radio = st.selectbox("Select bruises:", bruises_values)
+        odor_radio = st.selectbox("Select odor:", odor_values)
+        gill_attachment_radio = st.selectbox(
+            "Select gill attachment:", gill_attachment_values
+        )
+        gill_spacing_radio = st.selectbox("Select gill spacing:", gill_spacing_values)
 
-	with center:
-		gill_size_radio = st.selectbox("Select gill size:", gill_size_values)
-		gill_color_radio = st.selectbox("Select gill color:", gill_color_values)
-		stalk_shape_radio = st.selectbox("Select stalk shape:", stalk_shape_values)
-		stalk_root_radio = st.selectbox("Select stalk root:", stalk_root_values)
-		stalk_surface_below_ring_radio = st.selectbox(
-			"Select stalk surface below ring:", stalk_surface_below_ring_values
-		)
-		stalk_color_above_ring_radio = st.selectbox(
-			"Select stalk color above ring:", stalk_color_above_ring_values
-		)
-		stalk_color_below_ring_radio = st.selectbox(
-			"Select stalk color below ring:", stalk_color_below_ring_values
-		)
-		veil_type_radio = st.selectbox("Select veil type:", veil_type_values)
+    with center:
+        gill_size_radio = st.selectbox("Select gill size:", gill_size_values)
+        gill_color_radio = st.selectbox("Select gill color:", gill_color_values)
+        stalk_shape_radio = st.selectbox("Select stalk shape:", stalk_shape_values)
+        stalk_root_radio = st.selectbox("Select stalk root:", stalk_root_values)
+        stalk_surface_below_ring_radio = st.selectbox(
+            "Select stalk surface below ring:", stalk_surface_below_ring_values
+        )
+        stalk_color_above_ring_radio = st.selectbox(
+            "Select stalk color above ring:", stalk_color_above_ring_values
+        )
+        stalk_color_below_ring_radio = st.selectbox(
+            "Select stalk color below ring:", stalk_color_below_ring_values
+        )
+        veil_type_radio = st.selectbox("Select veil type:", veil_type_values)
 
-	with right:
-		stalk_surface_above_ring_radio = st.selectbox(
-			"Select stalk surface above ring:", stalk_surface_above_ring_values
-		)
-		veil_color_radio = st.selectbox("Select veil color:", veil_color_values)
-		ring_number_radio = st.selectbox("Select ring number:", ring_number_values)
-		ring_type_radio = st.selectbox("Select ring type:", ring_type_values)
-		spore_print_color_radio = st.selectbox(
-			"Select spore print color:", spore_print_color_values
-		)
-		population_radio = st.selectbox("Select population:", population_values)
-		habitat_radio = st.selectbox("Select habitat:", habitat_values)
+    with right:
+        stalk_surface_above_ring_radio = st.selectbox(
+            "Select stalk surface above ring:", stalk_surface_above_ring_values
+        )
+        veil_color_radio = st.selectbox("Select veil color:", veil_color_values)
+        ring_number_radio = st.selectbox("Select ring number:", ring_number_values)
+        ring_type_radio = st.selectbox("Select ring type:", ring_type_values)
+        spore_print_color_radio = st.selectbox(
+            "Select spore print color:", spore_print_color_values
+        )
+        population_radio = st.selectbox("Select population:", population_values)
+        habitat_radio = st.selectbox("Select habitat:", habitat_values)
 
-	data = {
-		"cap_shape": cap_shape_radio,
-		"cap_surface": cap_surface_radio,
-		"cap_color": cap_color_radio,
-		"bruises": bruises_radio,
-		"odor": odor_radio,
-		"gill_attachment": gill_attachment_radio,
-		"gill_spacing": gill_spacing_radio,
-		"gill_size": gill_size_radio,
-		"gill_color": gill_color_radio,
-		"stalk_shape": stalk_shape_radio,
-		"stalk_root": stalk_root_radio,
-		"stalk_surface_above_ring": stalk_surface_above_ring_radio,
-		"stalk_surface_below_ring": stalk_surface_below_ring_radio,
-		"stalk_color_above_ring": stalk_color_above_ring_radio,
-		"stalk_color_below_ring": stalk_color_below_ring_radio,
-		"veil_type": veil_type_radio,
-		"veil_color": veil_color_radio,
-		"ring_number": ring_number_radio,
-		"ring_type": ring_type_radio,
-		"spore_print_color": spore_print_color_radio,
-		"population": population_radio,
-		"habitat": habitat_radio,
-	}
+    data = {
+        "cap_shape": cap_shape_radio,
+        "cap_surface": cap_surface_radio,
+        "cap_color": cap_color_radio,
+        "bruises": bruises_radio,
+        "odor": odor_radio,
+        "gill_attachment": gill_attachment_radio,
+        "gill_spacing": gill_spacing_radio,
+        "gill_size": gill_size_radio,
+        "gill_color": gill_color_radio,
+        "stalk_shape": stalk_shape_radio,
+        "stalk_root": stalk_root_radio,
+        "stalk_surface_above_ring": stalk_surface_above_ring_radio,
+        "stalk_surface_below_ring": stalk_surface_below_ring_radio,
+        "stalk_color_above_ring": stalk_color_above_ring_radio,
+        "stalk_color_below_ring": stalk_color_below_ring_radio,
+        "veil_type": veil_type_radio,
+        "veil_color": veil_color_radio,
+        "ring_number": ring_number_radio,
+        "ring_type": ring_type_radio,
+        "spore_print_color": spore_print_color_radio,
+        "population": population_radio,
+        "habitat": habitat_radio,
+    }
 
-	URL = "http://127.0.0.1:8000/predict"
-	resp = requests.post(URL, json=data)
-	pred = resp.json()
+    URL = "http://127.0.0.1:8000/predict"
+    resp = requests.post(URL, json=data)
+    pred = resp.json()
 
-	# 0 = poison
-	# 1 = edible
+    with prediction:
+        st.subheader("Is the mushroom poisonous?")
+        st.text("Yes" if pred["prediction"] == 0 else "No")
 
-	with prediction:
-		st.subheader("Is the mushroom poisonous?")
-		st.text("Yes" if pred["prediction"] == 0 else "No")
-		# st.button("Submit", on_click=get_prediction(data))
+    st.subheader("Kedro pipeline")
+    col_l, col_r = st.columns(2)
+    with col_r:
+        hyperparameters = st.selectbox("Hyperparameters", hyperparameters_options)
+        presets = st.selectbox("Presets", presets_options)
+        eval_metric = st.selectbox("Eval metric", eval_metric_options)
+        time_limit = st.selectbox("Time limit", time_limit_options)
+    extra_params = {
+        "hyperparameters": hyperparameters,
+        "presets": presets,
+        "eval_metric": eval_metric,
+        "time_limit": time_limit,
+    }
+    with col_l:
+        st.button(
+            "Run Kedro Pipeline", on_click=run_kerdo_pipeline, kwargs=extra_params
+        )
+
+        st.link_button("Go to KedroViz", "http://127.0.0.1:4141/")
 
 
 if __name__ == "__main__":

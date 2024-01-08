@@ -29,7 +29,9 @@ def split_data(data: pd.DataFrame) -> Tuple:
     return X_train, X_test, y_train, y_test
 
 
-def train_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> TabularPredictor:
+def train_model(
+    X_train: pd.DataFrame, y_train: pd.DataFrame, model_params
+) -> TabularPredictor:
     """Trains the linear regression model.
 
     Args:
@@ -39,16 +41,24 @@ def train_model(X_train: pd.DataFrame, y_train: pd.DataFrame) -> TabularPredicto
     Returns:
         Trained model.
     """
+    print("Model params: ", model_params)
     label = "label"
     y_train = pd.DataFrame({"label": y_train})
     data = pd.concat([X_train, y_train], axis=1)
     train_data = TabularDataset(data)
-    predictor = TabularPredictor(label=label, path=path).fit(train_data)
+    predictor = TabularPredictor(
+        label=label, eval_metric=model_params["eval_metric"], path=path
+    ).fit(
+        train_data,
+        time_limit=model_params["time_limit"],
+        presets=model_params["presets"],
+        hyperparameters=model_params["hyperparameters"],
+    )
     return predictor
 
 
 def evaluate_model(
-    predictor: TabularPredictor, X_test: pd.DataFrame, y_test: pd.Series
+    predictor: TabularPredictor, X_test: pd.DataFrame, y_test: pd.Series, model_params
 ):
     """Calculates and logs the coefficient of determination.
 
@@ -64,11 +74,12 @@ def evaluate_model(
 
     predictor.leaderboard(data)
     leaderboard = predictor.leaderboard(silent=True)
-    best_model = leaderboard.iloc[0]["model"]  # Pobranie nazwy najlepszego modelu
+    best_model = leaderboard.iloc[0]["model"]
     shutil.move(f"{path}/models/{best_model}/model.pkl", "../bestmodel/model.pkl")
 
     wandb.init(project="mushrooms")
     wandb.log({"best model": leaderboard.iloc[0]["model"]})
-    wandb.log(**evaluation)
+    wandb.log(evaluation)
+    wandb.log(model_params)
 
     wandb.finish()
