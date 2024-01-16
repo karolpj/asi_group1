@@ -1,0 +1,38 @@
+{
+    "os": "macOS-13.4.1-arm64-arm-64bit",
+    "python": "3.10.11",
+    "heartbeatAt": "2023-11-07T09:46:56.297918",
+    "startedAt": "2023-11-07T09:46:55.216478",
+    "docker": null,
+    "cuda": null,
+    "args": [
+        "run"
+    ],
+    "state": "running",
+    "program": "-m kedro.__main__",
+    "codePathLocal": null,
+    "git": {
+        "remote": "https://github.com/karolpj/asi_group1.git",
+        "commit": "fdc4048914fe5dc4e4a5d6d752df3d426ea63d0a"
+    },
+    "email": "karolkozlowski9@gmail.com",
+    "root": "/Users/karolkozlowski/asi_group1-5",
+    "host": "172.23.68.147.wi-fi.pjwstk.edu.pl",
+    "username": "karolkozlowski",
+    "executable": "/usr/local/bin/python3",
+    "cpu_count": 8,
+    "cpu_count_logical": 8,
+    "disk": {
+        "/": {
+            "total": 228.27386474609375,
+            "used": 8.446861267089844
+        }
+    },
+    "gpuapple": {
+        "type": "arm",
+        "vendor": "Apple"
+    },
+    "memory": {
+        "total": 16.0
+    }
+}
