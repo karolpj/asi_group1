@@ -1,7 +1,7 @@
 # asi_group1
 
 ## Requirements
-- use Python < 3.11
+- use Python 3.10.11 https://www.python.org/downloads/release/python-31011/
 - install requirements listed in requirements.txt
 
 ## File structure
@@ -14,7 +14,7 @@
 
 ## Running
 - Install requirements `pip install -r requirements.txt`
+- Login to wandb `wandb init`
 - Run fastapi backend `cd ./fastpi & uvicorn main:app`
 - Run kedro viz `cd ./mushrooms & kedro viz`
-- Login to wandb `wandb init`
 - Run streamlit app `streamlit run ./streamlit_app.py`

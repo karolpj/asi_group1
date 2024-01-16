@@ -1,44 +1,19 @@
-from fastapi import FastAPI
-import pandas as pd
+import os
 import pickle
-import shutil
+import sqlite3
 
+import pandas as pd
+from kedro.framework.session import KedroSession
+from kedro.framework.startup import bootstrap_project
 from pydantic import BaseModel
+from sdv.metadata import SingleTableMetadata
+from sdv.single_table import GaussianCopulaSynthesizer
 
-app = FastAPI()
+from fastapi import FastAPI
 
-
-class MushroomInput(BaseModel):
-    cap_shape: str
-    cap_surface: str
-    cap_color: str
-    bruises: str
-    odor: str
-    gill_attachment: str
-    gill_spacing: str
-    gill_size: str
-    gill_color: str
-    stalk_shape: str
-    stalk_root: str
-    stalk_surface_above_ring: str
-    stalk_surface_below_ring: str
-    stalk_color_above_ring: str
-    stalk_color_below_ring: str
-    veil_type: str
-    veil_color: str
-    ring_number: str
-    ring_type: str
-    spore_print_color: str
-    population: str
-    habitat: str
-
-
-model_path = "../bestmodel/model.pkl"
-shutil.copyfile(model_path, "./model.pkl")
-with open("./model.pkl", "rb") as file:
-    loaded_model = pickle.load(file)
-
-columns = [
+MODEL_PATH = "../bestmodel/model.pkl"
+DATABASE_URI = "../data/mushrooms.db"
+DATA_COLUMNS = [
     "cap-shape_b",
     "cap-shape_c",
     "cap-shape_f",
@@ -159,10 +134,75 @@ columns = [
 ]
 
 
+app = FastAPI()
+
+
+class MushroomInput(BaseModel):
+    cap_shape: str
+    cap_surface: str
+    cap_color: str
+    bruises: str
+    odor: str
+    gill_attachment: str
+    gill_spacing: str
+    gill_size: str
+    gill_color: str
+    stalk_shape: str
+    stalk_root: str
+    stalk_surface_above_ring: str
+    stalk_surface_below_ring: str
+    stalk_color_above_ring: str
+    stalk_color_below_ring: str
+    veil_type: str
+    veil_color: str
+    ring_number: str
+    ring_type: str
+    spore_print_color: str
+    population: str
+    habitat: str
+
+
+def run_kerdo_pipeline(**kwargs):
+    os.chdir("../mushrooms")
+    bootstrap_project(os.getcwd())
+    params = {"model_params": kwargs}
+    session = KedroSession.create(extra_params=params)
+    session.run()
+    session.close()
+    os.chdir("../fastapi")
+
+
 @app.post("/predict")
 def predict_mushroom(mushroom: MushroomInput):
+    with open(MODEL_PATH, "rb") as file:
+        loaded_model = pickle.load(file)
     input_data = pd.DataFrame([mushroom.dict()])
     onehot = pd.get_dummies(input_data, dtype=int)
-    onehot = onehot.reindex(columns=columns, fill_value=0)
+    onehot = onehot.reindex(columns=DATA_COLUMNS, fill_value=0)
     prediction = loaded_model.predict(onehot)
     return {"prediction": prediction[0]}
+
+
+@app.get("/generate/{ammount}")
+def generate_data(ammount: int):
+    connection = sqlite3.connect(DATABASE_URI)
+    df = pd.read_sql("SELECT * FROM mushrooms", connection)
+    metadata = SingleTableMetadata()
+    metadata.detect_from_dataframe(df)
+    synthesizer = GaussianCopulaSynthesizer(metadata)
+    synthesizer.fit(df)
+    sample = synthesizer.sample(num_rows=ammount)
+    sample.to_sql("mushrooms", connection, if_exists="append", index=False)
+    json = sample.head(10).to_json()
+    return json
+
+
+@app.get("/run_pipeline")
+def run_pipeline(hyperparameters: str, presets: str, eval_metric: str, time_limit: int):
+    params = {
+        "hyperparameters": hyperparameters,
+        "presets": presets,
+        "eval_metric": eval_metric,
+        "time_limit": time_limit,
+    }
+    run_kerdo_pipeline(**params)

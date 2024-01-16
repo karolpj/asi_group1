@@ -1,9 +1,9 @@
-import streamlit as st
+import pandas as pd
 import requests
-import os
-from kedro.framework.session import KedroSession
-from kedro.framework.startup import bootstrap_project
 
+import streamlit as st
+
+BACKEND_URL = "http://127.0.0.1:8000/"
 
 cap_shape_values = ["x", "b", "f", "s", "k", "c"]
 cap_surface_values = ["s", "y", "f", "g"]
@@ -50,19 +50,19 @@ pred = None
 
 
 def run_kerdo_pipeline(**kwargs):
-    os.chdir("./mushrooms")
-    bootstrap_project(os.getcwd())
-    params = {"model_params": kwargs}
-    session = KedroSession.create(extra_params=params)
-    session.run()
-    session.close()
-    os.chdir("..")
+    requests.get(f"{BACKEND_URL}run_pipeline", params=kwargs)
 
 
 def get_prediction(data):
-    URL = "http://127.0.0.1:8000/predict"
+    URL = f"{BACKEND_URL}predict"
     resp = requests.post(URL, json=data)
-    pred = resp.json()
+
+
+def get_synthetic_data(ammount):
+    URL = f"{BACKEND_URL}generate/{ammount}"
+    resp = requests.get(URL)
+    df = pd.read_json(resp.json())
+    return df
 
 
 def main():
@@ -166,6 +166,16 @@ def main():
         )
 
         st.link_button("Go to KedroViz", "http://127.0.0.1:4141/")
+
+    st.subheader("Synthetic data generation")
+    synthetic_data_ammount = st.number_input(
+        "Select synthetic data ammount", min_value=1, step=100, value=100
+    )
+    if st.button("Generate synthetic data"):
+        data = get_synthetic_data(synthetic_data_ammount)
+        # run_kerdo_pipeline(**extra_params)
+        st.text("Synthetic data sample")
+        st.dataframe(data)
 
 
 if __name__ == "__main__":
